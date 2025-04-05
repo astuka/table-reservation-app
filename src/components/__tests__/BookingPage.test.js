@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import BookingPage from '../BookingPage';
+import BookingPage from '../BookingForm';
 import * as api from '../api';
 
 // Mock the API functions

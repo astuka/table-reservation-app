@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Nav from './components/Nav';
 import Footer from './components/Footer';
 import Homepage from './components/Homepage';
-import BookingPage from './components/BookingPage';
+import BookingPage from './components/BookingForm';
 import Chicago from './components/Chicago';
 
 import './App.css';
