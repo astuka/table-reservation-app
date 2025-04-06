@@ -395,6 +395,45 @@ main {
     flex-direction: column;
     gap: 1rem;
   }
+
+  nav {
+    margin: 0 20px;
+  }
+  
+  h1, .title {
+    font-size: 32pt;
+  }
+  
+  .subtitle {
+    font-size: 28pt;
+  }
+  
+  .lead-text {
+    font-size: 16pt;
+  }
+  
+  p {
+    font-size: 14pt;
+  }
+  
+  .button {
+    font-size: 16pt;
+    padding: 0.5rem 1rem;
+  }
+  
+  .booking .container {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-image {
+    height: 250px;
+  }
+  
+  .container {
+    padding: 1rem;
+  }
 }
 
 /* Footer Styles */
@@ -481,4 +520,28 @@ address {
   .social-links {
     align-items: center;
   }
+}
+
+/* Form validation styles */
+.error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.note {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.form-error {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 0.75rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1.5rem;
+  text-align: center;
 }

@@ -1,127 +1,153 @@
-import React, { useState, useEffect } from 'react';
-import { fetchAPI, submitAPI } from './api.js';
+import React, { useState } from 'react';
 
-const BookingPage = () => {
+const BookingForm = ({ availableTimes = [], date, onDateChange = () => {}, onSubmit }) => {
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+    date: date,
     time: '',
     guests: '2',
     occasion: 'birthday'
   });
-
-  const [availableTimes, setAvailableTimes] = useState([]);
-
-  useEffect(() => {
-    // Fetch available times for today when component mounts
-    fetchAvailableTimes(formData.date);
-  }, []);
-
-  const fetchAvailableTimes = (date) => {
-    // Convert the date string to a Date object
-    const dateObj = new Date(date);
-    const times = fetchAPI(dateObj);
-    setAvailableTimes(times);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  
+  const [formErrors, setFormErrors] = useState({});
+  
+  const validateForm = () => {
+    const errors = {};
     
-    // Submit the form data
-    const success = submitAPI(formData);
-    
-    if (success) {
-      console.log('Booking submitted successfully!');
-      // You could redirect to a confirmation page or show a success message
-      alert('Booking confirmed!');
-    } else {
-      console.log('Error submitting booking');
-      alert('Error submitting booking. Please try again.');
+    if (!formData.date) {
+      errors.date = "Please select a date";
     }
+    
+    if (!formData.time) {
+      errors.time = "Please select a time";
+    }
+    
+    const guestsNum = parseInt(formData.guests);
+    if (isNaN(guestsNum) || guestsNum < 1 || guestsNum > 10) {
+      errors.guests = "Please enter a number between 1 and 10";
+    }
+    
+    if (!formData.occasion) {
+      errors.occasion = "Please select an occasion";
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    if (name === "date") {
+      if (typeof onDateChange === 'function') {
+        onDateChange(value);
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-
-    // If date changes, fetch new available times
-    if (name === 'date') {
-      fetchAvailableTimes(value);
+    
+    // Clear error when field is modified
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
     }
   };
-
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (validateForm()) {
+      const success = onSubmit(formData);
+      if (!success) {
+        setFormErrors({
+          form: "There was an error submitting your reservation. Please try a different time."
+        });
+      }
+    }
+  };
+  
   return (
-    <section className="booking">
-      <div className="container">
-        <h1>Reserve a Table</h1>
-        <form onSubmit={handleSubmit} className="booking-form">
-          <div className="form-group">
-            <label htmlFor="date">Date</label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              required
-              min={new Date().toISOString().split('T')[0]} // Prevent past dates
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="time">Time</label>
-            <select
-              id="time"
-              name="time"
-              value={formData.time}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select a time</option>
-              {availableTimes.map(time => (
-                <option key={time} value={time}>{time}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="guests">Number of guests</label>
-            <input
-              type="number"
-              id="guests"
-              name="guests"
-              min="1"
-              max="10"
-              value={formData.guests}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="occasion">Occasion</label>
-            <select
-              id="occasion"
-              name="occasion"
-              value={formData.occasion}
-              onChange={handleChange}
-            >
-              <option value="birthday">Birthday</option>
-              <option value="anniversary">Anniversary</option>
-              <option value="business">Business</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <button type="submit" className="button">
-            Make Your Reservation
-          </button>
-        </form>
+    <form onSubmit={handleSubmit} className="booking-form">
+      {formErrors.form && (
+        <div className="form-error">{formErrors.form}</div>
+      )}
+      
+      <div className="form-group">
+        <label htmlFor="date">Date</label>
+        <input
+          type="date"
+          id="date"
+          name="date"
+          value={formData.date}
+          onChange={handleChange}
+          min={new Date().toISOString().split('T')[0]}
+          required
+        />
+        {formErrors.date && <span className="error">{formErrors.date}</span>}
       </div>
-    </section>
+
+      <div className="form-group">
+        <label htmlFor="time">Time</label>
+        <select
+          id="time"
+          name="time"
+          value={formData.time}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select a time</option>
+          {availableTimes.map(time => (
+            <option key={time} value={time}>{time}</option>
+          ))}
+        </select>
+        {formErrors.time && <span className="error">{formErrors.time}</span>}
+        {availableTimes.length === 0 && (
+          <span className="note">No times available for selected date</span>
+        )}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="guests">Number of guests</label>
+        <input
+          type="number"
+          id="guests"
+          name="guests"
+          min="1"
+          max="10"
+          value={formData.guests}
+          onChange={handleChange}
+          required
+        />
+        {formErrors.guests && <span className="error">{formErrors.guests}</span>}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="occasion">Occasion</label>
+        <select
+          id="occasion"
+          name="occasion"
+          value={formData.occasion}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select an occasion</option>
+          <option value="birthday">Birthday</option>
+          <option value="anniversary">Anniversary</option>
+          <option value="business">Business</option>
+          <option value="other">Other</option>
+        </select>
+        {formErrors.occasion && <span className="error">{formErrors.occasion}</span>}
+      </div>
+
+      <button type="submit" className="button">
+        Make Your Reservation
+      </button>
+    </form>
   );
 };
 
-export default BookingPage; 
+export default BookingForm; 
