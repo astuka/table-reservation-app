@@ -5,4 +5,7 @@ Final Project for Meta Front-End Developer course.
 
 # Notes
 
-- I wasn't able to get the API working from the github link, so I downloaded the api.js and am using it locally. However, it performs the fetch and submit API requests much like how it would if it was connecting to the github page.
+- Meta tags and OGP tags are in the index.html
+- BookingForm is the child component of BookingPage (viewable in the BookingPage.jsx, where you can also see available times are managed)
+- BookingForm contains client-side validation via "ValidateForm" function 
+- Unit tests are in "__tests__" folder
